@@ -24,12 +24,16 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Create Note'),
+        title: const Text(
+          'New Note',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             child: Center(
               child: Consumer<NotesViewModel>(
                 builder: (context, notesViewModel, _) {
@@ -37,11 +41,23 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
                         )
-                      : TextButton.icon(
-                          icon: const Icon(Icons.save),
+                      : ElevatedButton.icon(
+                          icon: const Icon(Icons.check, size: 20),
                           label: const Text('Save'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
                           onPressed: _handleSaveNote,
                         );
                 },
@@ -52,80 +68,109 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
       ),
       body: Consumer<NotesViewModel>(
         builder: (context, notesViewModel, _) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // Error message
-                if (notesViewModel.errorMessage != null)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade100,
-                      border: Border.all(color: Colors.red.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.red.shade700),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            notesViewModel.errorMessage!,
-                            style: TextStyle(color: Colors.red.shade700),
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Error message
+                    if (notesViewModel.errorMessage != null)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withOpacity(0.1),
+                          border: Border.all(
+                            color: const Color(0xFFEF4444),
                           ),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
-                  ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Color(0xFFEF4444),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                notesViewModel.errorMessage!,
+                                style: const TextStyle(
+                                  color: Color(0xFFEF4444),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
-                // Title field
-                TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    hintText: 'Note title',
-                    border: InputBorder.none,
-                    hintStyle: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
+                    // Title field
+                    TextField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        hintText: 'Note title',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      enabled: !notesViewModel.isLoading,
+                      maxLines: null,
                     ),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  enabled: !notesViewModel.isLoading,
-                  maxLines: null,
-                ),
-                const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
-                // Divider
-                Container(
-                  height: 1,
-                  color: Colors.grey.shade300,
-                ),
-                const SizedBox(height: 16),
-
-                // Content field
-                TextField(
-                  controller: _contentController,
-                  decoration: InputDecoration(
-                    hintText: 'Start typing...',
-                    border: InputBorder.none,
-                    hintStyle: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                    // Metadata
+                    Text(
+                      'Today • ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                      ),
                     ),
-                  ),
-                  style: const TextStyle(fontSize: 16),
-                  enabled: !notesViewModel.isLoading,
-                  maxLines: null,
-                  minLines: 5,
+                    const SizedBox(height: 24),
+
+                    // Divider
+                    Container(
+                      height: 1,
+                      color: Colors.grey[300],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Content field
+                    TextField(
+                      controller: _contentController,
+                      decoration: InputDecoration(
+                        hintText: 'Start typing your note here...',
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                        height: 1.6,
+                      ),
+                      enabled: !notesViewModel.isLoading,
+                      maxLines: null,
+                      minLines: 8,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         },
       ),
@@ -138,7 +183,10 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
 
     if (title.isEmpty || content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Color(0xFFEF4444),
+        ),
       );
       return;
     }

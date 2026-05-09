@@ -37,12 +37,16 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Edit Note'),
+        title: const Text(
+          'Edit Note',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         actions: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             child: Center(
               child: Consumer<NotesViewModel>(
                 builder: (context, notesViewModel, _) {
@@ -50,11 +54,23 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                       ? const SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
                         )
-                      : TextButton.icon(
-                          icon: const Icon(Icons.save),
+                      : ElevatedButton.icon(
+                          icon: const Icon(Icons.check, size: 20),
                           label: const Text('Save'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
                           onPressed: _handleUpdateNote,
                         );
                 },
@@ -66,28 +82,37 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
       body: Consumer<NotesViewModel>(
         builder: (context, notesViewModel, _) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Error message
                 if (notesViewModel.errorMessage != null)
                   Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade100,
-                      border: Border.all(color: Colors.red.shade400),
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFFEF4444).withOpacity(0.1),
+                      border: Border.all(
+                        color: const Color(0xFFEF4444),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline, color: Colors.red.shade700),
+                        const Icon(
+                          Icons.error_outline,
+                          color: Color(0xFFEF4444),
+                          size: 20,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             notesViewModel.errorMessage!,
-                            style: TextStyle(color: Colors.red.shade700),
+                            style: const TextStyle(
+                              color: Color(0xFFEF4444),
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -97,70 +122,98 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                 // Title field
                 TextField(
                   controller: _titleController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Note title',
                     border: InputBorder.none,
-                    hintStyle: const TextStyle(
-                      fontSize: 24,
+                    hintStyle: TextStyle(
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,
                     ),
                   ),
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                   enabled: !notesViewModel.isLoading,
                   maxLines: null,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Metadata
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Created: ${DateFormat('MMM dd, yyyy HH:mm').format(widget.note.createdAt)}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today,
+                                size: 14, color: Colors.grey[600]),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Created: ${DateFormat('MMM dd, yyyy HH:mm').format(widget.note.createdAt)}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.update,
+                                size: 14, color: Colors.grey[600]),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Updated: ${DateFormat('MMM dd, yyyy HH:mm').format(widget.note.updatedAt)}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.update, size: 16, color: Colors.grey),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Updated: ${DateFormat('MMM dd, yyyy HH:mm').format(widget.note.updatedAt)}',
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
                 // Divider
                 Container(
                   height: 1,
-                  color: Colors.grey.shade300,
+                  color: Colors.grey[300],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Content field
                 TextField(
                   controller: _contentController,
                   decoration: InputDecoration(
-                    hintText: 'Start typing...',
+                    hintText: 'Start typing your note here...',
                     border: InputBorder.none,
-                    hintStyle: const TextStyle(
+                    hintStyle: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey,
+                      color: Colors.grey[400],
                     ),
                   ),
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    height: 1.6,
+                  ),
                   enabled: !notesViewModel.isLoading,
                   maxLines: null,
-                  minLines: 5,
+                  minLines: 8,
                 ),
               ],
             ),
@@ -176,7 +229,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
 
     if (title.isEmpty || content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Color(0xFFEF4444),
+        ),
       );
       return;
     }
@@ -184,7 +240,10 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     // Check if there are any changes
     if (title == widget.note.title && content == widget.note.content) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No changes made')),
+        const SnackBar(
+          content: Text('No changes made'),
+          backgroundColor: Colors.blue,
+        ),
       );
       return;
     }

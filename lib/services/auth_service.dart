@@ -3,7 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 
 class AuthService {
-final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final auth.FirebaseAuth _firebaseAuth = auth.FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  AuthService() {
+    // Disable reCAPTCHA for development/testing
+    _firebaseAuth.setLanguageCode('en');
+  }
 
   // Get current user stream
   Stream<User?> get authStateChanges {
