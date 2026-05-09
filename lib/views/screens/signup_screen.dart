@@ -353,8 +353,24 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
       password: password,
     );
 
+    // FIXED: Redirect to login screen instead of notes
     if (success && mounted) {
-      Navigator.of(context).pushReplacementNamed('/notes');
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Account created successfully! Please login.'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      
+      // Clear the form
+      _emailController.clear();
+      _passwordController.clear();
+      _confirmPasswordController.clear();
+      
+      // Navigate to login screen
+      Navigator.of(context).pushReplacementNamed('/login');
     }
   }
 }

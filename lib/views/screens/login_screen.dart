@@ -242,13 +242,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 WidgetSpan(
                                   child: GestureDetector(
                                     onTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const SignUpScreen(),
-                                        ),
-                                      );
+                                      // Use named route for navigation
+                                      Navigator.pushReplacementNamed(context, '/signup');
                                     },
                                     child: const Text(
                                       'Create Account',

@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/notes_viewmodel.dart';
 import 'views/screens/login_screen.dart';
+import 'views/screens/signup_screen.dart';
 import 'views/screens/notes_list_screen.dart';
 
 void main() async {
@@ -29,9 +30,10 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Notes App',
         theme: _buildTheme(),
-        home: const AuthWrapper(),
+        initialRoute: '/login',
         routes: {
           '/login': (_) => const LoginScreen(),
+          '/signup': (_) => const SignUpScreen(),
           '/notes': (_) => const NotesListScreen(),
         },
       ),
@@ -95,23 +97,6 @@ class MyApp extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-    );
-  }
-}
-
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<AuthViewModel>(
-      builder: (context, authViewModel, _) {
-        if (authViewModel.isLoggedIn) {
-          return const NotesListScreen();
-        } else {
-          return const LoginScreen();
-        }
-      },
     );
   }
 }
