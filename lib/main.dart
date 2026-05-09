@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/notes_viewmodel.dart';
-import 'views/screens/splash_screen.dart';  // Import splash screen
+import 'views/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Notes App',
         theme: _buildTheme(),
-        home: const SplashScreen(),  // Start with splash screen
+        home: const SplashScreen(),
         routes: {
           '/login': (_) => const LoginScreen(),
           '/signup': (_) => const SignUpScreen(),
@@ -53,8 +53,8 @@ class MyApp extends StatelessWidget {
         backgroundColor: Color(0xFF6366F1),
         foregroundColor: Colors.white,
       ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: const Color(0xFF6366F1),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Color(0xFF6366F1),
         foregroundColor: Colors.white,
         elevation: 8,
       ),
@@ -90,7 +90,8 @@ class MyApp extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       cardTheme: CardTheme(
         elevation: 2,

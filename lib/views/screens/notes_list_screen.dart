@@ -212,24 +212,29 @@ class _NotesListScreenState extends State<NotesListScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditNoteScreen(note: note),
-              ),
-            );
-            if (result == true && mounted) {
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('✓ Note updated successfully'),
-                  backgroundColor: Color(0xFF10B981),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-          },
+         onTap: () async {
+  // ✅ Capture messenger BEFORE any async operation
+  final messenger = ScaffoldMessenger.of(context);
+
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditNoteScreen(note: note),
+    ),
+  );
+
+  // ✅ Use captured messenger (safe after await)
+  if (result == true && mounted) {
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('✓ Note updated successfully'),
+        backgroundColor: Color(0xFF10B981),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+},
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(
@@ -373,47 +378,44 @@ void _handleDeleteNote(
 }
 
   void _handleLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Close dialog
-              Navigator.pop(dialogContext);
-              
-              // Show loading indicator
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logging out...'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
-              
-              // Perform logout
-              await context.read<AuthViewModel>().signOut();
-              
-              // Navigate to login if mounted
-              if (mounted) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                Navigator.of(context).pushReplacementNamed('/login');
-              }
-            },
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('Logout'),
+      content: const Text('Are you sure you want to logout?'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(dialogContext);
+
+            // ✅ Capture before await
+            final messenger = ScaffoldMessenger.of(context);
+            final navigator = Navigator.of(context);
+
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
+              const SnackBar(
+                content: Text('Logging out...'),
+                duration: Duration(seconds: 1),
+              ),
+            );
+
+            await context.read<AuthViewModel>().signOut();
+
+            if (mounted) {
+              messenger.clearSnackBars();
+              navigator.pushReplacementNamed('/login');
+            }
+          },
+          child: const Text('Logout', style: TextStyle(color: Color(0xFFEF4444))),
+        ),
+      ],
+    ),
+  );
+}
 }

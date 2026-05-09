@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
@@ -8,6 +9,10 @@ class AuthViewModel extends ChangeNotifier {
   User? _user;
   bool _isLoading = false;
   String? _errorMessage;
+
+  // Completes once the first auth state event is received
+  final Completer<void> _authReadyCompleter = Completer<void>();
+  Future<void> get authStateReady => _authReadyCompleter.future;
 
   User? get user => _user;
   bool get isLoading => _isLoading;
@@ -24,6 +29,11 @@ class AuthViewModel extends ChangeNotifier {
     _authService.authStateChanges.listen((user) {
       _user = user;
       notifyListeners();
+
+      // Complete on the very first emission — auth state is now known
+      if (!_authReadyCompleter.isCompleted) {
+        _authReadyCompleter.complete();
+      }
     });
   }
 
