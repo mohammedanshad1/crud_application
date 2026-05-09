@@ -354,23 +354,22 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
     );
 
     // FIXED: Redirect to login screen instead of notes
-    if (success && mounted) {
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Account created successfully! Please login.'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
-      
-      // Clear the form
-      _emailController.clear();
-      _passwordController.clear();
-      _confirmPasswordController.clear();
-      
-      // Navigate to login screen
-      Navigator.of(context).pushReplacementNamed('/login');
-    }
+    // In your signup_screen.dart, after successful signup:
+if (success && mounted) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('✅ Account created successfully! Please login.'),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 3),
+    ),
+  );
+  
+  _emailController.clear();
+  _passwordController.clear();
+  _confirmPasswordController.clear();
+  
+  // Navigate to login screen
+  Navigator.of(context).pushReplacementNamed('/login');
+}
   }
 }

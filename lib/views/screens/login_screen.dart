@@ -291,8 +291,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       password: password,
     );
 
-    if (success && mounted) {
-      Navigator.of(context).pushReplacementNamed('/notes');
-    }
+   // In your login_screen.dart, after successful login:
+if (success && mounted) {
+  // Navigate to notes screen
+  Navigator.of(context).pushReplacementNamed('/notes');
+}
   }
 }

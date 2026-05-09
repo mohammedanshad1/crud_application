@@ -355,31 +355,34 @@ class _NotesListScreenState extends State<NotesListScreen> {
     );
   }
 
-  void _handleLogout() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<AuthViewModel>().signOut();
-              Navigator.pop(context);
+ void _handleLogout() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Logout'),
+      content: const Text('Are you sure you want to logout?'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await context.read<AuthViewModel>().signOut();
+            if (mounted) {
+              Navigator.pop(context); // Close dialog
+              // Navigate to login screen
               Navigator.of(context).pushReplacementNamed('/login');
-            },
-            child: const Text(
-              'Logout',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
+            }
+          },
+          child: const Text(
+            'Logout',
+            style: TextStyle(color: Color(0xFFEF4444)),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 }

@@ -1,12 +1,13 @@
+import 'package:crud_application/views/screens/login_screen.dart';
+import 'package:crud_application/views/screens/notes_list_screen.dart';
+import 'package:crud_application/views/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/notes_viewmodel.dart';
-import 'views/screens/login_screen.dart';
-import 'views/screens/signup_screen.dart';
-import 'views/screens/notes_list_screen.dart';
+import 'views/screens/splash_screen.dart';  // Import splash screen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Notes App',
         theme: _buildTheme(),
-        initialRoute: '/login',
+        home: const SplashScreen(),  // Start with splash screen
         routes: {
           '/login': (_) => const LoginScreen(),
           '/signup': (_) => const SignUpScreen(),

@@ -30,19 +30,19 @@ class NotesService {
     }
   }
 
-  // Get all notes for a user
-  Stream<List<Note>> getUserNotes(String userId) {
-    return _firestore
-        .collection('notes')
-        .where('userId', isEqualTo: userId)
-        .orderBy('updatedAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Note.fromMap(doc.data(), doc.id);
-      }).toList();
-    });
-  }
+ // Update getUserNotes method in NotesService
+Stream<List<Note>> getUserNotes(String userId) {
+  return _firestore
+      .collection('notes')
+      .where('userId', isEqualTo: userId)
+      .orderBy('updatedAt', descending: true)  // Uncomment this
+      .snapshots()
+      .map((snapshot) {
+    return snapshot.docs.map((doc) {
+      return Note.fromMap(doc.data(), doc.id);
+    }).toList();
+  });
+}
 
   // Get a single note by ID
   Future<Note?> getNoteById(String noteId) async {
