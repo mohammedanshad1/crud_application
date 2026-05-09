@@ -223,53 +223,55 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     );
   }
 
-  Future<void> _handleUpdateNote(BuildContext context) async {
-    final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
+ Future<void> _handleUpdateNote(BuildContext context) async {
+  final title = _titleController.text.trim();
+  final content = _contentController.text.trim();
 
-    if (title.isEmpty || content.isEmpty) {
-      // Show error in current screen
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields'),
-          backgroundColor: Color(0xFFEF4444),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    // Check if there are any changes
-    if (title == widget.note.title && content == widget.note.content) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No changes made'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-
-    final notesViewModel = context.read<NotesViewModel>();
-    final success = await notesViewModel.updateNote(
-      noteId: widget.note.id,
-      title: title,
-      content: content,
+  if (title.isEmpty || content.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Please fill in all fields'),
+        backgroundColor: Color(0xFFEF4444),
+        duration: Duration(seconds: 2),
+      ),
     );
-
-    if (success && mounted) {
-      // Pop with success result - the SnackBar will be shown in the previous screen
-      Navigator.pop(context, true);
-    } else if (mounted) {
-      // Show error in current screen
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update note'),
-          backgroundColor: Color(0xFFEF4444),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    return;
   }
+
+  // Check if there are any changes
+  if (title == widget.note.title && content == widget.note.content) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('No changes made'),
+        backgroundColor: Colors.blue,
+        duration: Duration(seconds: 2),
+      ),
+    );
+    return;
+  }
+
+  // ✅ Capture before async gap
+  final messenger = ScaffoldMessenger.of(context);
+  final navigator = Navigator.of(context);
+
+  final notesViewModel = context.read<NotesViewModel>();
+  final success = await notesViewModel.updateNote(
+    noteId: widget.note.id,
+    title: title,
+    content: content,
+  );
+
+  // ✅ Use captured references — no context lookup after await
+  if (success) {
+    navigator.pop(true);
+  } else {
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Failed to update note'),
+        backgroundColor: Color(0xFFEF4444),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
 }
