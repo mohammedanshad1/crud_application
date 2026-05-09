@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:crud_application/viewmodels/auth_viewmodel.dart';
+import 'package:crud_application/views/screens/login_screen.dart';
+import 'package:crud_application/views/screens/notes_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'login_screen.dart';
-import 'notes_list_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _setupAnimations();
-    _checkAuthState();
+    _navigateToNextScreen();
   }
 
   void _setupAnimations() {
@@ -35,41 +35,36 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
+    _scaleAnimation = Tween<double>(begin: 0.6, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     _animationController.forward();
   }
 
-  Future<void> _checkAuthState() async {
-    // Wait for animation to complete (2 seconds)
+  Future<void> _navigateToNextScreen() async {
+    // Wait for animation to finish
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
     final authViewModel = context.read<AuthViewModel>();
-    
-    // Small delay to ensure auth state is loaded
-    await Future.delayed(const Duration(milliseconds: 500));
+
+    // ✅ IMPORTANT: Wait for auth state to be ready
+    await authViewModel.authStateReady;
 
     if (!mounted) return;
 
-    // Check if user is logged in
+    // Now we can safely check login status
     if (authViewModel.isLoggedIn) {
-      // User is logged in - go to notes screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const NotesListScreen()),
+        MaterialPageRoute(builder: (_) => const NotesListScreen()),
       );
     } else {
-      // User is not logged in - go to login screen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
   }
@@ -103,7 +98,6 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // App Icon
                   Container(
                     width: 120,
                     height: 120,
@@ -118,7 +112,6 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 32),
-                  // App Name
                   const Text(
                     'Notes App',
                     style: TextStyle(
@@ -129,7 +122,6 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Tagline
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -141,14 +133,10 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     child: const Text(
                       'Your Digital Notebook',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 48),
-                  // Loading indicator
                   const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     strokeWidth: 2,

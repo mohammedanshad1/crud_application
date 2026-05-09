@@ -25,17 +25,22 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   // Initialize auth state
-  void _initialize() {
-    _authService.authStateChanges.listen((user) {
-      _user = user;
-      notifyListeners();
-
-      // Complete on the very first emission — auth state is now known
-      if (!_authReadyCompleter.isCompleted) {
-        _authReadyCompleter.complete();
-      }
-    });
+void _initialize() {
+  // Immediate check
+  _user = _authService.currentUser;
+  if (_user != null && !_authReadyCompleter.isCompleted) {
+    _authReadyCompleter.complete();
   }
+
+  _authService.authStateChanges.listen((user) {
+    _user = user;
+    notifyListeners();
+
+    if (!_authReadyCompleter.isCompleted) {
+      _authReadyCompleter.complete();
+    }
+  });
+}
 
   // Sign up
   Future<bool> signUp({
