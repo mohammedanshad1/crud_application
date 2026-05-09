@@ -315,69 +315,62 @@ class _NotesListScreenState extends State<NotesListScreen> {
     );
   }
 
-  void _handleDeleteNote(
-    BuildContext context,
-    Note note,
-    NotesViewModel notesViewModel,
-  ) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Note'),
-        content: const Text('Are you sure you want to delete this note?'),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Close the dialog first
-              Navigator.pop(dialogContext);
-              
-              // Show loading indicator
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(
+void _handleDeleteNote(
+  BuildContext context,
+  Note note,
+  NotesViewModel notesViewModel,
+) {
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('Delete Note'),
+      content: const Text('Are you sure you want to delete this note?'),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            // ✅ Capture messenger BEFORE any async gap
+            final messenger = ScaffoldMessenger.of(context);
+
+            // Close the dialog
+            Navigator.pop(dialogContext);
+
+            // Perform delete operation
+            final success = await notesViewModel.deleteNote(note.id);
+
+            // ✅ Use captured messenger — no context lookup after async gap
+            messenger.clearSnackBars();
+            if (success) {
+              messenger.showSnackBar(
                 const SnackBar(
-                  content: Text('Deleting note...'),
-                  duration: Duration(seconds: 1),
+                  content: Text('✓ Note deleted successfully'),
+                  backgroundColor: Color(0xFF10B981),
+                  duration: Duration(seconds: 2),
                 ),
               );
-              
-              // Perform delete operation
-              final success = await notesViewModel.deleteNote(note.id);
-              
-              // Show result
-              if (success && mounted) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('✓ Note deleted successfully'),
-                    backgroundColor: Color(0xFF10B981),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              } else if (mounted) {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Failed to delete note'),
-                    backgroundColor: Color(0xFFEF4444),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
+            } else {
+              messenger.showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to delete note'),
+                  backgroundColor: Color(0xFFEF4444),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            }
+          },
+          child: const Text(
+            'Delete',
+            style: TextStyle(color: Color(0xFFEF4444)),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   void _handleLogout(BuildContext context) {
     showDialog(
