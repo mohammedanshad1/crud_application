@@ -41,7 +41,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout, size: 24),
-                onPressed: _handleLogout,
+                onPressed: () => _handleLogout(context),
               ),
             ],
           ),
@@ -82,7 +82,6 @@ class _NotesListScreenState extends State<NotesListScreen> {
                   },
                 ),
               ),
-
               // Notes list
               Expanded(
                 child: StreamBuilder<List<Note>>(
@@ -115,9 +114,16 @@ class _NotesListScreenState extends State<NotesListScreen> {
                     }
 
                     final notes = snapshot.data ?? [];
-                    notesViewModel.updateNotes(notes);
-
-                    final displayNotes = notesViewModel.notes;
+                    
+                    // REMOVED: notesViewModel.updateNotes(notes); - This was causing the error
+                    
+                    // Apply search filter directly
+                    final displayNotes = _isSearching && _searchController.text.isNotEmpty
+                        ? notes.where((note) =>
+                            note.title.toLowerCase().contains(_searchController.text.toLowerCase()) ||
+                            note.content.toLowerCase().contains(_searchController.text.toLowerCase())
+                          ).toList()
+                        : notes;
 
                     if (displayNotes.isEmpty) {
                       return Center(
@@ -266,9 +272,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
                               ],
                             ),
                             onTap: () {
-                              Future.delayed(Duration.zero, () {
-                                _handleDeleteNote(context, note, notesViewModel);
-                              });
+                              _handleDeleteNote(context, note, notesViewModel);
                             },
                           ),
                         ],
@@ -355,34 +359,34 @@ class _NotesListScreenState extends State<NotesListScreen> {
     );
   }
 
- void _handleLogout() {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Logout'),
-      content: const Text('Are you sure you want to logout?'),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () async {
-            await context.read<AuthViewModel>().signOut();
-            if (mounted) {
-              Navigator.pop(context); // Close dialog
-              // Navigate to login screen
-              Navigator.of(context).pushReplacementNamed('/login');
-            }
-          },
-          child: const Text(
-            'Logout',
-            style: TextStyle(color: Color(0xFFEF4444)),
+  void _handleLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-        ),
-      ],
-    ),
-  );
-}
+          TextButton(
+            onPressed: () async {
+              await context.read<AuthViewModel>().signOut();
+              if (mounted) {
+                Navigator.pop(context);
+                // Use pushReplacementNamed for proper navigation
+                Navigator.of(context).pushReplacementNamed('/login');
+              }
+            },
+            child: const Text(
+              'Logout',
+              style: TextStyle(color: Color(0xFFEF4444)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
