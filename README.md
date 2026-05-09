@@ -18,7 +18,7 @@ A clean, secure, and user-friendly Notes application built with **Flutter** and 
 - ✅ Beautiful, clean and responsive UI
 - ✅ Smooth animations and loading states
 - ✅ Splash screen with intelligent navigation
-- ✅ Proper error handling and user feedback
+- ✅ Proper error handling 
 
 ---
 
@@ -35,7 +35,7 @@ A clean, secure, and user-friendly Notes application built with **Flutter** and 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Flutter SDK (Latest stable)
+- Flutter SDK (Version 3.29.0)
 - Android Studio or VS Code
 - Firebase Project
 
