@@ -61,8 +61,9 @@ class _NotesListScreenState extends State<NotesListScreen> {
                             icon: const Icon(Icons.close),
                             onPressed: () {
                               _searchController.clear();
-                              notesViewModel.clearSearch();
-                              setState(() => _isSearching = false);
+                              setState(() {
+                                _isSearching = false;
+                              });
                             },
                           )
                         : null,
@@ -71,14 +72,6 @@ class _NotesListScreenState extends State<NotesListScreen> {
                     setState(() {
                       _isSearching = value.isNotEmpty;
                     });
-                    if (value.isEmpty) {
-                      notesViewModel.clearSearch();
-                    } else {
-                      notesViewModel.searchNotes(
-                        userId: userId,
-                        query: value,
-                      );
-                    }
                   },
                 ),
               ),
@@ -108,6 +101,13 @@ class _NotesListScreenState extends State<NotesListScreen> {
                               'Error: ${snapshot.error}',
                               textAlign: TextAlign.center,
                             ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {});
+                              },
+                              child: const Text('Retry'),
+                            ),
                           ],
                         ),
                       );
@@ -115,9 +115,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
 
                     final notes = snapshot.data ?? [];
                     
-                    // REMOVED: notesViewModel.updateNotes(notes); - This was causing the error
-                    
-                    // Apply search filter directly
+                    // Apply search filter directly in UI
                     final displayNotes = _isSearching && _searchController.text.isNotEmpty
                         ? notes.where((note) =>
                             note.title.toLowerCase().contains(_searchController.text.toLowerCase()) ||
@@ -186,10 +184,12 @@ class _NotesListScreenState extends State<NotesListScreen> {
                 ),
               );
               if (result == true && mounted) {
+                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('✓ Note created successfully'),
                     backgroundColor: Color(0xFF10B981),
+                    duration: Duration(seconds: 2),
                   ),
                 );
               }
@@ -220,10 +220,12 @@ class _NotesListScreenState extends State<NotesListScreen> {
               ),
             );
             if (result == true && mounted) {
+              ScaffoldMessenger.of(context).clearSnackBars();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('✓ Note updated successfully'),
                   backgroundColor: Color(0xFF10B981),
+                  duration: Duration(seconds: 2),
                 ),
               );
             }
@@ -320,31 +322,49 @@ class _NotesListScreenState extends State<NotesListScreen> {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Note'),
         content: const Text('Are you sure you want to delete this note?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              // Close the dialog first
+              Navigator.pop(dialogContext);
+              
+              // Show loading indicator
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Deleting note...'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+              
+              // Perform delete operation
               final success = await notesViewModel.deleteNote(note.id);
+              
+              // Show result
               if (success && mounted) {
+                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('✓ Note deleted successfully'),
                     backgroundColor: Color(0xFF10B981),
+                    duration: Duration(seconds: 2),
                   ),
                 );
               } else if (mounted) {
+                ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Failed to delete note'),
                     backgroundColor: Color(0xFFEF4444),
+                    duration: Duration(seconds: 2),
                   ),
                 );
               }
@@ -362,21 +382,35 @@ class _NotesListScreenState extends State<NotesListScreen> {
   void _handleLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
+              // Close dialog
+              Navigator.pop(dialogContext);
+              
+              // Show loading indicator
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Logging out...'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+              
+              // Perform logout
               await context.read<AuthViewModel>().signOut();
+              
+              // Navigate to login if mounted
               if (mounted) {
-                Navigator.pop(context);
-                // Use pushReplacementNamed for proper navigation
+                ScaffoldMessenger.of(context).clearSnackBars();
                 Navigator.of(context).pushReplacementNamed('/login');
               }
             },

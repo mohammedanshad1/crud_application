@@ -71,7 +71,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                               vertical: 8,
                             ),
                           ),
-                          onPressed: _handleUpdateNote,
+                          onPressed: () => _handleUpdateNote(context),
                         );
                 },
               ),
@@ -223,15 +223,17 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     );
   }
 
-  Future<void> _handleUpdateNote() async {
+  Future<void> _handleUpdateNote(BuildContext context) async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
 
     if (title.isEmpty || content.isEmpty) {
+      // Show error in current screen
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
           backgroundColor: Color(0xFFEF4444),
+          duration: Duration(seconds: 2),
         ),
       );
       return;
@@ -243,6 +245,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
         const SnackBar(
           content: Text('No changes made'),
           backgroundColor: Colors.blue,
+          duration: Duration(seconds: 2),
         ),
       );
       return;
@@ -256,7 +259,17 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
     );
 
     if (success && mounted) {
+      // Pop with success result - the SnackBar will be shown in the previous screen
       Navigator.pop(context, true);
+    } else if (mounted) {
+      // Show error in current screen
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update note'),
+          backgroundColor: Color(0xFFEF4444),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 }
